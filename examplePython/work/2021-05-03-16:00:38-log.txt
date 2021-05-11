@@ -1,0 +1,16 @@
+2021-05-03 16:00:38 (info) Logger: Start session log file: 2021-05-03-16:00:38-log.txt
+2021-05-03 16:00:38 (info) ConfigParametersForApp: Read configuration parameters from file: confpars-calibman.txt
+2021-05-03 16:00:38 (warning) ConfigParametersForApp: The file confpars-calibman.txt is not found, use default parameters.
+2021-05-03 16:00:40 (info) GUIMain: user: bpoult@psanagpu110  cwd: /cds/home/b/bpoult/examplePython
+    command: /cds/sw/ds/ana/conda1/inst/envs/ana-4.0.21/bin/calibman
+2021-05-03 16:00:40 (info) CalibManager.GUIMainTabs:  makeTabBarr - set tab: Status
+2021-05-03 16:00:49 (info) CalibManager.GUIInsExpDirDet: Instrument selected: XPP
+2021-05-03 16:00:49 (info) CalibManager.GUIInsExpDirDet: Experiment selected: Select
+2021-05-03 16:00:49 (info) CalibManager.GUIInsExpDirDet: Set calibration directory: Select
+2021-05-03 16:00:49 (info) CalibManager.GUIInsExpDirDet: Selected detector(s): 
+2021-05-03 16:01:22 (info) GUIMain: closeEvent
+2021-05-03 16:01:22 (info) CalibManager.GUIInsExpDirDet: closeEvent
+2021-05-03 16:01:22 (info) GUIMainTabs: closeEvent
+2021-05-03 16:01:22 (info) GUIMain: Save main window x,y,w,h : 41, 36, 800, 700
+2021-05-03 16:01:22 (info) CalibManager.ConfigParametersForApp: save configuration parameters in file: confpars-calibman.txt
+2021-05-03 16:01:22 (info) ConfigParametersForApp: Save configuration parameters in file: confpars-calibman.txt
