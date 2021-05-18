@@ -9,3 +9,7 @@ r210  | 7.075keV
 r211  | 7.080keV
 r212  | 7.085keV
 r213  | 7.090keV
+
+run = XXXX
+data source: ds = ps.DataSource('exp=cxix46119:run='+run+':smd')
+
