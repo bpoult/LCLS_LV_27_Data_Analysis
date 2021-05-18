@@ -5,11 +5,10 @@ import psana as ps
 import pickle
 import matplotlib.pyplot as plt
 import time
-from data_classes import raw_data_class as RDC
-
+from raw_data_class import RawData as RDC
 
 def load_data(save_dir,scan_name,ds_string, epix_roi, xrt_roi):
-    raw_data = RDC
+    RawData = RDC()
 
     ds = ps.DataSource(ds_string)
     epix = ps.Detector('epix10k135')
@@ -74,7 +73,8 @@ def load_data(save_dir,scan_name,ds_string, epix_roi, xrt_roi):
     high_diode_us_events = np.asarray(high_diode_us_events)
     epix_events = np.asarray(epix_events)
     xrt_events = np.asarray(xrt_events)
-    raw_data.changeValue(eventIDS = eventIDs, photon_energies=photon_energies,I0_fee = pulse_intensities,
+    
+    RawData.changeValue(eventIDS = eventIDs, photon_energies=photon_energies,I0_fee = pulse_intensities,
                          low_diode_us=low_diode_us_events,high_diode_us=high_diode_us_events, epix_spectrum=epix_events,
                          xrt_spectrum=xrt_events,avg_epix_2d=epix_roiSum,xrt_intensity=np.sum(xrt_events,1),
                          epix_intensity=np.sum(epix_events,1))
@@ -87,6 +87,6 @@ def load_data(save_dir,scan_name,ds_string, epix_roi, xrt_roi):
             os.mkdir(save_dir + scan_name)
 
     with open(save_dir + scan_name + '/' + "rawdata.pkl", "wb") as f:
-        pickle.dump(raw_data, f)
+        pickle.dump(RawData, f)
 
-    return raw_data
+    return RawData
