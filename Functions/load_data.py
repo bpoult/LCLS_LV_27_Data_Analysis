@@ -2,12 +2,13 @@ import sys
 import os
 import numpy as np
 import psana as ps
+import pickle
 import matplotlib.pyplot as plt
 import time
 from data_classes import raw_data_class as RDC
 
 
-def load_data(ds_string, epix_roi, xrt_roi):
+def load_data(save_dir,scan_name,ds_string, epix_roi, xrt_roi):
     raw_data = RDC
 
     ds = ps.DataSource(ds_string)
@@ -77,5 +78,15 @@ def load_data(ds_string, epix_roi, xrt_roi):
                          low_diode_us=low_diode_us_events,high_diode_us=high_diode_us_events, epix_spectrum=epix_events,
                          xrt_spectrum=xrt_events,avg_epix_2d=epix_roiSum,xrt_intensity=np.sum(xrt_events,1),
                          epix_intensity=np.sum(epix_events,1))
+
+    if not os.path.isdir(save_dir + scan_name):
+        try:
+            os.mkdir(save_dir + scan_name)
+        except:
+            os.mkdir(save_dir)
+            os.mkdir(save_dir + scan_name)
+
+    with open(save_dir + scan_name + '/' + "rawdata.pkl", "wb") as f:
+        pickle.dump(raw_data, f)
 
     return raw_data
