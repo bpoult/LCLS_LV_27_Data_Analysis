@@ -2,18 +2,19 @@ import matplotlib.pyplot as plt
 import numpy as np
 import psana as ps
 
+
 def plot_raw(datas, plot_one, x_axis, on_off):
     if not on_off:
         print('Raw Data plotting is turned off.')
         return
 
     runs = [datas[i].scan_name for i in range(0, len(datas))]
-    epix_array = np.asarray([np.mean(datas[i].epix_spectrum, 0) for i in range(0, len(datas))],dtype=object)
-    xrt_array = np.asarray([np.mean(datas[i].xrt_spectrum) for i in range(0, len(datas))],dtype=object)
+    epix_array = np.asarray([np.mean(datas[i].epix_spectrum, 0) for i in range(0, len(datas))], dtype=object)
+    xrt_array = np.asarray([np.mean(datas[i].xrt_spectrum) for i in range(0, len(datas))], dtype=object)
     epix_rois = [datas[i].epix_roi for i in range(0, len(datas))]
     xrt_rois = [datas[i].xrt_roi for i in range(0, len(datas))]
 
-    if bool == [s for s in runs if 'run_' + str(plot_one) in s]:
+    if not any(x == 'run_' + str(plot_one) for x in runs):
         print('The run you want to plot individually is not in the input runs')
         return
 
@@ -66,7 +67,7 @@ def plot_raw(datas, plot_one, x_axis, on_off):
             non_calib = [str(runs[i]) for i in range(0, len(runs)) if check_calib[i] is False]
             print('The following do not have calibrations: ' + str(non_calib))
             return
-        calib_arrays =[datas[i].calibration for i in range(0,len(datas))]
+        calib_arrays = [datas[i].calibration for i in range(0, len(datas))]
 
         plt.figure()
         plt.plot(datas.calibration[4], xrt_array[idx])
@@ -80,7 +81,7 @@ def plot_raw(datas, plot_one, x_axis, on_off):
         plt.xlabel('Energy, keV')
         plt.show()
 
-        if not all(calib_arrays[0][5] == x for x in [calib_arrays[i][5] for i in range(0,len(calib_arrays))]):
+        if not all(calib_arrays[0][5] == x for x in [calib_arrays[i][5] for i in range(0, len(calib_arrays))]):
             print('You are trying to average epix spectra with different energy ranges.')
             plt.figure()
             plt.plot(datas.calibration[4], np.mean(xrt_array, 0))
@@ -88,7 +89,7 @@ def plot_raw(datas, plot_one, x_axis, on_off):
             plt.xlabel('Energy, keV')
             return
 
-        if not all(calib_arrays[0][4] == x for x in [calib_arrays[i][4] for i in range(0,len(calib_arrays))]):
+        if not all(calib_arrays[0][4] == x for x in [calib_arrays[i][4] for i in range(0, len(calib_arrays))]):
             print('You are trying to average xrt spectra with different energy ranges.')
             plt.figure()
             plt.plot(datas.calibration[5], np.mean(epix_array, 0))
