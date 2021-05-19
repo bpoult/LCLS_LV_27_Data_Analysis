@@ -11,7 +11,8 @@ class RawData:
                  'xrt_spectrum',
                  'avg_epix_2d',
                  'xrt_intensity',
-                 'epix_intensity']
+                 'epix_intensity',
+                'scan_name']
 
     _default_value = None
 
