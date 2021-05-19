@@ -1,4 +1,6 @@
 import matplotlib.pyplot as plt
+import os
+import sys
 import numpy as np
 import psana as ps
 
@@ -10,7 +12,7 @@ def plot_raw(datas, plot_one, x_axis, on_off):
 
     runs = [datas[i].scan_name for i in range(0, len(datas))]
     epix_array = np.asarray([np.mean(datas[i].epix_spectrum, 0) for i in range(0, len(datas))], dtype=object)
-    xrt_array = np.asarray([np.mean(datas[i].xrt_spectrum) for i in range(0, len(datas))], dtype=object)
+    xrt_array = np.asarray([np.mean(datas[i].xrt_spectrum,0) for i in range(0, len(datas))], dtype=object)
     epix_rois = [datas[i].epix_roi for i in range(0, len(datas))]
     xrt_rois = [datas[i].xrt_roi for i in range(0, len(datas))]
 
