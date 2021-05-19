@@ -1,5 +1,9 @@
 # Written by Ben Poulter for LCLS run 19, LV 27.
 
+import matplotlib.pyplot as plt
+import numpy as np
+import psana as ps
+
 
 class RawData:
     _defaults = ['eventIDs',
@@ -7,12 +11,14 @@ class RawData:
                  'I0_fee',
                  'high_diode_us',
                  'low_diode_us',
+                 'epix_roi',
+                 'xrt_roi',
                  'epix_spectrum',
                  'xrt_spectrum',
                  'avg_epix_2d',
                  'xrt_intensity',
                  'epix_intensity',
-                'scan_name']
+                 'scan_name']
 
     _default_value = None
 
@@ -25,3 +31,7 @@ class RawData:
 
     def getKeys(self):
         return self.__dict__.keys()
+
+    def energy_calib(self, datas, calib):
+
+        return
