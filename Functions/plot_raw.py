@@ -72,40 +72,40 @@ def plot_raw(datas, plot_one, x_axis, on_off):
         calib_arrays = [datas[i].calibration for i in range(0, len(datas))]
 
         plt.figure()
-        plt.plot(datas.calibration[4], xrt_array[idx])
+        plt.plot(datas[0].calibration[4], xrt_array[idx])
         plt.title('xrt spectrum of run_' + str(plot_one))
         plt.xlabel('Energy, keV')
         plt.show()
 
         plt.figure()
-        plt.plot(datas.calibration[5], epix_array[idx])
+        plt.plot(datas[0].calibration[5], epix_array[idx])
         plt.title('epix spectrum of run_' + str(plot_one))
         plt.xlabel('Energy, keV')
         plt.show()
 
-        if not all(calib_arrays[0][5] == x for x in [calib_arrays[i][5] for i in range(0, len(calib_arrays))]):
+        if np.prod(np.asarray([calib_arrays[0][5] == calib_arrays[i][5] for i in range(0,len(calib_arrays))])) != 1:
             print('You are trying to average epix spectra with different energy ranges.')
             plt.figure()
-            plt.plot(datas.calibration[4], np.mean(xrt_array, 0))
+            plt.plot(datas[0].calibration[4], np.mean(xrt_array, 0))
             plt.title('xrt spectrum of averaged runs')
             plt.xlabel('Energy, keV')
             return
 
-        if not all(calib_arrays[0][4] == x for x in [calib_arrays[i][4] for i in range(0, len(calib_arrays))]):
+        if np.prod(np.asarray([calib_arrays[0][4] == calib_arrays[i][4] for i in range(0,len(calib_arrays))])) != 1:
             print('You are trying to average xrt spectra with different energy ranges.')
             plt.figure()
-            plt.plot(datas.calibration[5], np.mean(epix_array, 0))
+            plt.plot(datas[0].calibration[5], np.mean(epix_array, 0))
             plt.title('epix spectrum of averaged runs')
             plt.xlabel('Energy, keV')
             return
 
         plt.figure()
-        plt.plot(datas.calibration[4], np.mean(xrt_array, 0))
+        plt.plot(datas[0].calibration[4], np.mean(xrt_array, 0))
         plt.title('xrt spectrum of averaged runs')
         plt.xlabel('Energy, keV')
 
         plt.figure()
-        plt.plot(datas.calibration[5], np.mean(epix_array, 0))
+        plt.plot(datas[0].calibration[5], np.mean(epix_array, 0))
         plt.title('epix spectrum of averaged runs')
         plt.xlabel('Energy, keV')
         return
