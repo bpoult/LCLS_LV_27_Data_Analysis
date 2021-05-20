@@ -53,6 +53,9 @@ class RawData:
 
         calib[0].append(['xrt_energy','epix_energy'])
         calib.append([xrt_energy,epix_energy])
-
         raw_data.changeValue(calibration=calib)
+
+
+        with open(save_dir + scan_name + '/' + "rawdata.pkl", "wb") as f:
+            pickle.dump(RawData, f)
         return raw_data
