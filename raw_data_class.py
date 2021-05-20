@@ -40,10 +40,10 @@ class RawData:
 
     def energy_calib(self, calib):
         raw_data = self
-        xrt_pix = np.asarray([calib[1][x] for x in range(0,len(calib[1])) if calib[1][x] != 0])
-        keV_xrt = np.asarray([calib[0][x] for x in range(0, len(calib[1])) if calib[1][x] != 0])
-        epix_pix = np.asarray([calib[2][x] for x in range(0,len(calib[2])) if calib[2][x] != 0])
-        keV_epix = np.asarray([calib[0][x] for x in range(0, len(calib[2])) if calib[2][x] != 0])
+        xrt_pix = np.asarray([calib[2][x] for x in range(0,len(calib[2])) if calib[2][x] != 0])
+        keV_xrt = np.asarray([calib[1][x] for x in range(0, len(calib[2])) if calib[2][x] != 0])
+        epix_pix = np.asarray([calib[3][x] for x in range(0,len(calib[3])) if calib[3][x] != 0])
+        keV_epix = np.asarray([calib[1][x] for x in range(0, len(calib[3])) if calib[3][x] != 0])
 
         m_xrt, b_xrt = np.polyfit(xrt_pix, keV_xrt, 1)
         m_epix, b_epix = np.polyfit(epix_pix, keV_epix, 1)
