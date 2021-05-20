@@ -32,6 +32,27 @@ class RawData:
     def getKeys(self):
         return self.__dict__.keys()
 
-    def energy_calib(self, datas, calib):
+    # labels = ['notch_energies', 'xrt_pixels', 'epix_pixels']
+    # notch_energies = [7.06, 7.065, 7.07, 7.075, 7.08, 7.085, 7.09]  # keV
+    # xrt_pixels = [0, 1, 2, 3, 4, 5, 0]  # enter 0 if you can't see the notch
+    # epix_pixels = [1, 2, 3, 4, 5, 6]  # enter 0 if you can't see the notch
+    # calib = [labels, notch_energies, xrt_pixels, epix_pixels]
 
-        return
+    def energy_calib(self, calib):
+        raw_data = self
+        xrt_pix = np.asarray([calib[1][x] for x in range(0,len(calib[1])) if calib[1][x] != 0])
+        keV_xrt = np.asarray([calib[0][x] for x in range(0, len(calib[1])) if calib[1][x] != 0])
+        epix_pix = np.asarray([calib[2][x] for x in range(0,len(calib[2])) if calib[2][x] != 0])
+        keV_epix = np.asarray([calib[0][x] for x in range(0, len(calib[2])) if calib[2][x] != 0])
+
+        m_xrt, b_xrt = np.polyfit(xrt_pix, keV_xrt, 1)
+        m_epix, b_epix = np.polyfit(epix_pix, keV_epix, 1)
+
+        xrt_energy = m_xrt*np.arange(raw_data.xrt_roi[0],raw_data.xrt_roi[1])+b_xrt
+        epix_energy = m_epix * np.arange(raw_data.epix_roi[2], raw_data.epix_roi[3]) + b_epix
+
+        calib[0].append(['xrt_energy','epix_energy'])
+        calib.append([xrt_energy,epix_energy])
+
+        raw_data.changeValue(calibration=calib)
+        return raw_data
