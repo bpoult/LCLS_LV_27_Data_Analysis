@@ -19,7 +19,8 @@ class RawData:
                  'avg_epix_2d',
                  'xrt_intensity',
                  'epix_intensity',
-                 'scan_name']
+                 'scan_name',
+                  'epix_motor']
 
     _default_value = None
 

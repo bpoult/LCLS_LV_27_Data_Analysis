@@ -3,9 +3,10 @@ import os
 import sys
 import numpy as np
 import psana as ps
+import pickle
+from raw_data_class import RawData as RDC
 
-
-def plot_raw(datas, plot_one, x_axis, on_off):
+def plot_raw(datas, plot_one, x_axis, on_off,calibration_file):
     if not on_off:
         print('Raw Data plotting is turned off.')
         return
@@ -16,33 +17,39 @@ def plot_raw(datas, plot_one, x_axis, on_off):
     epix_rois = [datas[i].epix_roi for i in range(0, len(datas))]
     xrt_rois = [datas[i].xrt_roi for i in range(0, len(datas))]
 
-    if not any(x == 'run_' + str(plot_one) for x in runs):
+    if not any(x == 'run_' + str(plot_one) for x in runs) and plot_one is not False:
         print('The run you want to plot individually is not in the input runs')
         return
 
+        
     idx = runs.index('run_' + str(plot_one))
     if x_axis == 'pixels':
+        if plot_one:
+            plt.figure()
+            plt.plot(range(xrt_rois[idx][0], xrt_rois[idx][1]), xrt_array[idx])
+            plt.title('xrt spectrum of run_' + str(plot_one))
+            plt.xlabel('Pixels')
+            plt.show()
 
-        plt.figure()
-        plt.plot(range(xrt_rois[idx][0], xrt_rois[idx][1]), xrt_array[idx])
-        plt.title('xrt spectrum of run_' + str(plot_one))
-        plt.xlabel('Pixels')
-        plt.show()
-
-        plt.figure()
-        plt.plot(range(epix_rois[idx][2], epix_rois[idx][3]), epix_array[idx])
-        plt.title('epix spectrum of run_' + str(plot_one))
-        plt.xlabel('Pixels')
-        plt.show()
-
-        if not all(x == epix_rois[0] for x in epix_rois):
-            print('You are trying to average epix spectra with different ROIs.')
+            plt.figure()
+            plt.plot(range(epix_rois[idx][2], epix_rois[idx][3]), epix_array[idx])
+            plt.title('epix spectrum of run_' + str(plot_one))
+            plt.xlabel('Pixels')
+            plt.show()
+            
+        if not all(datas[0].epix_motor == datas[x].epix_motor for x in range(0,len(datas))) and all(x == xrt_rois[0] for x in xrt_rois):
+            print('You are trying to average epix spectra with different epix motor positions.')
+            print('You are trying to average xrt spectra with different ROIs.')
+            return
+        
+        if not all(datas[0].epix_motor == datas[x].epix_motor for x in range(0,len(datas))):
+            print('You are trying to average epix spectra with different epix motor positions.')
             plt.figure()
             plt.plot(range(xrt_rois[idx][0], xrt_rois[idx][1]), np.mean(xrt_array, 0))
             plt.title('xrt spectrum of averaged runs')
             plt.xlabel('Pixels')
             return
-
+        
         if not all(x == xrt_rois[0] for x in xrt_rois):
             print('You are trying to average xrt spectra with different ROIs.')
             plt.figure()
@@ -63,49 +70,44 @@ def plot_raw(datas, plot_one, x_axis, on_off):
         return
 
     if x_axis == 'energy':
-        check_calib = [hasattr(datas[i], 'calibration') for i in range(0, len(datas))]
-
-        if not any(check_calib):
-            non_calib = [str(runs[i]) for i in range(0, len(runs)) if check_calib[i] is False]
-            print('The following do not have calibrations: ' + str(non_calib))
+        
+        if not os.path.exists(calibration_file[0]+calibration_file[1]+'.pkl'):
+            print('The calibration file does not exist.')
             return
-        calib_arrays = [datas[i].calibration for i in range(0, len(datas))]
+        
+        with open(calibration_file[0]+calibration_file[1]+'.pkl', "rb") as f: 
+            calibration = pickle.load(f)
+            check_matching = [datas[i].epix_motor == calibration[9] for i in range(0,len(datas))]
+            
+        if not all(check_matching):
+            print('The calibration and the following runs have different epix motor positions: ')
+            print([runs[i] for i in range(0,len(runs)) if check_matching[i] is False])
+            return
+        
+        if plot_one:
 
-        plt.figure()
-        plt.plot(datas[0].calibration[4], xrt_array[idx])
-        plt.title('xrt spectrum of run_' + str(plot_one))
-        plt.xlabel('Energy, keV')
-        plt.show()
-
-        plt.figure()
-        plt.plot(datas[0].calibration[5], epix_array[idx])
-        plt.title('epix spectrum of run_' + str(plot_one))
-        plt.xlabel('Energy, keV')
-        plt.show()
-
-        if np.prod(np.asarray([calib_arrays[0][5] == calib_arrays[i][5] for i in range(0,len(calib_arrays))])) != 1:
-            print('You are trying to average epix spectra with different energy ranges.')
             plt.figure()
-            plt.plot(datas[0].calibration[4], np.mean(xrt_array, 0))
-            plt.title('xrt spectrum of averaged runs')
+            plt.plot(calibration[7], xrt_array[idx])
+            plt.title('xrt spectrum of run_' + str(plot_one))
             plt.xlabel('Energy, keV')
-            return
+            plt.show()
 
-        if np.prod(np.asarray([calib_arrays[0][4] == calib_arrays[i][4] for i in range(0,len(calib_arrays))])) != 1:
-            print('You are trying to average xrt spectra with different energy ranges.')
             plt.figure()
-            plt.plot(datas[0].calibration[5], np.mean(epix_array, 0))
-            plt.title('epix spectrum of averaged runs')
+            plt.plot(calibration[8], epix_array[idx])
+            plt.title('epix spectrum of run_' + str(plot_one))
             plt.xlabel('Energy, keV')
-            return
+            plt.show()
 
         plt.figure()
-        plt.plot(datas[0].calibration[4], np.mean(xrt_array, 0))
+        plt.plot(calibration[7], np.mean(xrt_array, 0))
         plt.title('xrt spectrum of averaged runs')
         plt.xlabel('Energy, keV')
 
         plt.figure()
-        plt.plot(datas[0].calibration[5], np.mean(epix_array, 0))
+        plt.plot(calibration[8], np.mean(epix_array, 0))
         plt.title('epix spectrum of averaged runs')
         plt.xlabel('Energy, keV')
+        
+        [datas[i]
+        
         return
