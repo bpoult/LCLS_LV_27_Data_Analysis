@@ -91,3 +91,20 @@ def load_data(save_dir,scan_name,ds_string, epix_roi, xrt_roi):
         pickle.dump(RawData, f)
 
     return RawData
+
+def add_cal_info(raw_data,to_cal_file):
+    if not os.path.exists(to_cal_file[0]+to_cal_file[1]+'.pkl'):
+        return
+    else:
+        with open(to_cal_file[0] + to_cal_file[1] +'.pkl', "rb") as f:
+            calibration = pickle.load(f)
+        if not calibration[9] == raw_data.epix_motor:
+            return
+        if hasattr(raw_data,'calibration_info'):
+            previous_cal = raw_data.calibration_info[5][1]
+            raw_data.changeValue(calibration_info=calibration,previous_cal=previous_cal)   
+        else: 
+            raw_data.changeValue(calibration_info=calibration)
+    with open(raw_data.save_dir + raw_data.scan_name + '/' + "rawdata.pkl", "wb") as f:
+        pickle.dump(raw_data, f)
+        

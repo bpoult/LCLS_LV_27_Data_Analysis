@@ -108,6 +108,4 @@ def plot_raw(datas, plot_one, x_axis, on_off,calibration_file):
         plt.title('epix spectrum of averaged runs')
         plt.xlabel('Energy, keV')
         
-        [datas[i]
-        
         return

@@ -29,20 +29,17 @@ def energy_calib(calibration,save_cal):
     if all(x == epix_motor[0] for x in epix_motor):
         xrt_energy = m_xrt * np.arange(calib[4][0][0],calib[4][0][1]) + b_xrt
         epix_energy = m_epix * np.arange(calib[4][1][2],calib[4][1][3]) + b_epix
-       
 
-    
         calib[0] = calib[0] + list(['xrt_energy', 'epix_energy','epix_motor','time_calibrated'])
         calib.append(xrt_energy)
         calib.append(epix_energy)
         calib.append(epix_motor[0])
         calib.append(datetime.datetime.now())
     
-    
-    
         if save_cal == True:
             if not os.path.isdir(calib[5][0]):
                 os.mkdir(calib[5][0])
+            if not os.path.isdir(calib[5][0]+calib[5][1]):
                 with open(calib[5][0] + calib[5][1] + '.pkl', "wb") as f:
                     pickle.dump(calib, f)
                     print(calib[5][1] + '.pkl has been saved.')

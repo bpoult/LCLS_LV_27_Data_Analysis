@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import psana as ps
 import pickle
+import os
 
 
 class RawData:
@@ -33,4 +34,3 @@ class RawData:
 
     def getKeys(self):
         return self.__dict__.keys()
-    
