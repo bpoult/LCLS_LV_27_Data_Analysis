@@ -37,6 +37,13 @@ def plot_raw(datas, plot_one, x_axis, on_off,calibration_file):
             plt.xlabel('Pixels')
             plt.show()
             
+            
+            fig, ax = plt.subplots()
+            plt.title('average epix image from run_' + str(plot_one))
+            x_y = [epix_rois[idx][2], epix_rois[idx][3],epix_rois[idx][0],epix_rois[idx][1]]
+            plt.xlabel('Pixels')
+            ax.imshow(datas[idx].avg_epix_2d, extent=x_y)
+            
         if not all(datas[0].epix_motor == datas[x].epix_motor for x in range(0,len(datas))) and all(x == xrt_rois[0] for x in xrt_rois):
             print('You are trying to average epix spectra with different epix motor positions.')
             print('You are trying to average xrt spectra with different ROIs.')
@@ -67,6 +74,10 @@ def plot_raw(datas, plot_one, x_axis, on_off,calibration_file):
         plt.plot(range(epix_rois[idx][2], epix_rois[idx][3]), np.mean(epix_array, 0))
         plt.title('epix spectrum of averaged runs')
         plt.xlabel('Pixels')
+        
+        
+        
+        
         return
 
     if x_axis == 'energy':
@@ -97,6 +108,12 @@ def plot_raw(datas, plot_one, x_axis, on_off,calibration_file):
             plt.title('epix spectrum of run_' + str(plot_one))
             plt.xlabel('Energy, keV')
             plt.show()
+            
+            fig, ax = plt.subplots()
+            plt.title('average epix image from run_' + str(plot_one))
+            x_y = [calibration[8][0],calibration[8][-1],0,0.05]
+            plt.xlabel('energy, keV')
+            ax.imshow(datas[idx].avg_epix_2d,extent=x_y)
 
         plt.figure()
         plt.plot(calibration[7], np.mean(xrt_array, 0))

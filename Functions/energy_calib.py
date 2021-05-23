@@ -39,12 +39,12 @@ def energy_calib(calibration,save_cal):
         if save_cal == True:
             if not os.path.isdir(calib[5][0]):
                 os.mkdir(calib[5][0])
-            if not os.path.isdir(calib[5][0]+calib[5][1]):
+            if not os.path.exists(calib[5][0]+calib[5][1] +'.pkl'):
                 with open(calib[5][0] + calib[5][1] + '.pkl', "wb") as f:
                     pickle.dump(calib, f)
-                    print(calib[5][1] + '.pkl has been saved.')
             if os.path.exists(calib[5][0] + calib[5][1] + '.pkl') and input('Overwrite ' + calib[5][1]+ '.pkl? (y/n)') is 'y':
                 with open(calib[5][0] + calib[5][1] + '.pkl', "wb") as f:
                     pickle.dump(calib, f)
-                    print(calib[5][1] + '.pkl has been saved.')
+                print(calib[5][1] + '.pkl has been saved.')
+
         return calib

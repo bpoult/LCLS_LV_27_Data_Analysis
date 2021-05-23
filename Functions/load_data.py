@@ -23,7 +23,7 @@ def load_data(save_dir,scan_name,ds_string, epix_roi, xrt_roi):
     low_diode_us_events = []
     high_diode_us_events = []
     photon_energies = []
-    pulse_intensities = []
+    pulse_energies = []
     i = 0
 
     epix_roiYMin = epix_roi[2]
@@ -57,7 +57,7 @@ def load_data(save_dir,scan_name,ds_string, epix_roi, xrt_roi):
 
         eventIDs.append(nevent)
         photon_energies.append(photonEnergy)
-        pulse_intensities.append(fee_evt.f_11_ENRC())
+        pulse_energies.append([fee_evt.f_11_ENRC(),fee_evt.f_21_ENRC(),fee_evt.f_63_ENRC()])
         low_diode_us_events.append(low_diode_us_evt)
         high_diode_us_events.append(high_diode_us_evt)
         epix_events.append(np.sum(np.squeeze(epix_data), 0))
@@ -68,24 +68,24 @@ def load_data(save_dir,scan_name,ds_string, epix_roi, xrt_roi):
     print(str(nevent - i) + ' out of ' + str(nevent) + ' shots had empty values.')
     eventIDs = np.asarray(eventIDs)
     photon_energies = np.asarray(photon_energies)
-    pulse_intensities = np.asarray(pulse_intensities)
+    pulse_energies = np.asarray(pulse_energies)
     low_diode_us_events = np.asarray(low_diode_us_events)
     high_diode_us_events = np.asarray(high_diode_us_events)
     epix_events = np.asarray(epix_events)
     xrt_events = np.asarray(xrt_events)
     epix_motor = ps.Detector('CXI:DG2:MMS:10.RBV').__call__()
-    RawData.changeValue(eventIDS = eventIDs, photon_energies=photon_energies,I0_fee = pulse_intensities,
+    RawData.changeValue(eventIDS = eventIDs, photon_energies=photon_energies,pulse_energies_fee = pulse_energies,
                          low_diode_us=low_diode_us_events,high_diode_us=high_diode_us_events, epix_spectrum=epix_events,
                          xrt_spectrum=xrt_events,avg_epix_2d=np.asarray(epix_roiSum/i),xrt_intensity=np.sum(xrt_events,1),
                          epix_intensity=np.sum(epix_events,1),scan_name=scan_name,epix_roi=epix_roi,xrt_roi=xrt_roi,
                         save_dir=save_dir,ds_string=ds_string,epix_motor=round(epix_motor,5))
 
-    if not os.path.isdir(save_DIR + scan_name):
+    if not os.path.isdir(save_dir + scan_name):
         try:
-            os.mkdir(save_DIR + scan_name)
+            os.mkdir(save_dir + scan_name)
         except:
-            os.mkdir(save_DIR)
-            os.mkdir(save_DIR + scan_name)
+            os.mkdir(save_dir)
+            os.mkdir(save_dir + scan_name)
 
     with open(save_dir + scan_name + '/' + "rawdata.pkl", "wb") as f:
         pickle.dump(RawData, f)
