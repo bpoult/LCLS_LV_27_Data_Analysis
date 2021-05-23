@@ -74,7 +74,7 @@ def load_data(save_dir,scan_name,ds_string, epix_roi, xrt_roi):
     epix_events = np.asarray(epix_events)
     xrt_events = np.asarray(xrt_events)
     epix_motor = ps.Detector('CXI:DG2:MMS:10.RBV').__call__()
-    RawData.changeValue(eventIDS = eventIDs, photon_energies=photon_energies,pulse_energies_fee = pulse_energies,
+    RawData.changeValue(eventIDs = eventIDs, photon_energies=photon_energies,pulse_energies_fee = pulse_energies,
                          low_diode_us=low_diode_us_events,high_diode_us=high_diode_us_events, epix_spectrum=epix_events,
                          xrt_spectrum=xrt_events,avg_epix_2d=np.asarray(epix_roiSum/i),xrt_intensity=np.sum(xrt_events,1),
                          epix_intensity=np.sum(epix_events,1),scan_name=scan_name,epix_roi=epix_roi,xrt_roi=xrt_roi,
