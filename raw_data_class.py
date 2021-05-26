@@ -1,4 +1,5 @@
-# Written by Ben Poulter for LCLS run 19, LV 27.
+# Written by Ben Poulter (Khalil Group, University of Washington), May 2021
+# For LV27 LCLS Beamtime.
 
 import matplotlib.pyplot as plt
 import numpy as np

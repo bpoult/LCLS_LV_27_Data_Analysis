@@ -1,3 +1,6 @@
+# Written by Ben Poulter (Khalil Group, University of Washington), May 2021
+# For LV27 LCLS Beamtime.
+
 import numpy as np
 import os
 import pickle
