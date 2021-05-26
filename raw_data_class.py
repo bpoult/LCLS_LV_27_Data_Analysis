@@ -65,7 +65,8 @@ class RawData:
                                    xrt_windowed=raw.xrt_windowed[combined_conditions],
                                    xrt_red_res=raw.xrt_red_res[combined_conditions],
                                    filters=filters)
-        
+        if not (raw.eventIDs[combined_conditions] == processed_data.eventIDs).all():
+            print('Something in the filter went wrong... The events that passed the filter do not match the events in the processed data')
         if not os.path.isdir(processed_data.save_dir + processed_data.scan_name):
             try:
                 os.mkdir(processed_data.save_dir + processed_data.scan_name)
