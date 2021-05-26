@@ -48,6 +48,7 @@ class RawData:
     def make_pro_data(self,conditions,filters):
         processed_data = PDC()
         raw=self
+        
         combined_conditions = np.asarray(conditions).all(axis=0)
         
         processed_data.changeValue(eventIDs=raw.eventIDs[combined_conditions],
