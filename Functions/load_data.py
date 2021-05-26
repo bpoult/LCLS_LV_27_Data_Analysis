@@ -63,6 +63,8 @@ def load_data(save_dir,scan_name,ds_string, epix_roi, xrt_roi):
         epix_events.append(np.sum(np.squeeze(epix_data), 0))
         xrt_events.append(xrt_evt.hproj()[XRTMin:XRTMax])
         i += 1
+        print('Loading: ...  Currently on shot: ' + str(i), end="\r", flush=True)
+
     elapsed_time = (time.time() - start)
     print('Data loaded in ' + str(np.round(elapsed_time, 1)) + ' seconds.')
     print(str(nevent - i) + ' out of ' + str(nevent) + ' shots had empty values.')
@@ -89,7 +91,6 @@ def load_data(save_dir,scan_name,ds_string, epix_roi, xrt_roi):
                         save_dir=save_dir,
                         ds_string=ds_string,
                         epix_motor=round(epix_motor,5))
-
     if not os.path.isdir(save_dir + scan_name):
         try:
             os.mkdir(save_dir + scan_name)

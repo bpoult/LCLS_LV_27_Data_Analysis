@@ -25,13 +25,11 @@ class RawData:
                 'epix_motor',
                 'save_dir',
                 'ds_string',
-                'calibration_info',
                 'previous_cal',
                 'epix_energy_windowed',
                 'epix_windowed',
                 'xrt_energy_windowed',
-                'xrt_windowed',
-                'xrt_red_res']
+                'xrt_windowed']
 
     _default_value = None
 
