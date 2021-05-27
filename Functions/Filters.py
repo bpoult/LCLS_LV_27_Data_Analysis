@@ -7,14 +7,15 @@ import sys
 import numpy as np
 import psana as ps
 
-def filtering(raw_data, filters):
+def filtering(raw_data, filters,suspress_output):
     all_events = raw_data.eventIDs
     conditions = []
     bounds_cond = []
     lin_conds = []
     good_shots = []
     really_good_shots = []
-    print('Filter info for ' + raw_data.scan_name + ':')
+    if not suspress_output:
+        print('Filter info for ' + raw_data.scan_name + ':')
     for i in range(0,len(filters)):
         if not filters[i][0]:
             conditions.append('None')
@@ -33,16 +34,21 @@ def filtering(raw_data, filters):
         really_good_shots.append(list(set.intersection(*[set(x) for x in good_shots])))
         if raw_data.scan_name == 'run_'+str(filters[i][3][1]):
             if i is 0:
+                if suspress_output:
+                    print('Filter info for ' + raw_data.scan_name + ':')
                 print('Filter' + str(i) + ' removed ' + str(len(all_events)-len(really_good_shots[i])) + ' unique shots out of ' +str(len(all_events)) + ' total shots.')
             else:
-                print('Filter' + str(i) + ' removed ' + str(len(really_good_shots[i-1])-len(really_good_shots[i])) + ' unique shots out of ' +str(len(all_events)) + ' total shots.')        
+                print('Filter' + str(i) + ' removed ' + str(len(really_good_shots[i-1])-len(really_good_shots[i])) + ' unique shots out of ' +str(len(all_events)) + ' total shots.')
+            if i is len(filters) -1:
+                print('The combined filters removed ' + str(len(all_events)-len(really_good_shots[-1])) + ' shots out of ' +str(len(all_events)) +' total shots.')
+                print('')
     rm_by_bounds = len(all_events)-len(really_good_shots[len(bounds_cond)-1])
     rm_by_lin = len(really_good_shots[len(bounds_cond)-1])-len(really_good_shots[len(bounds_cond)+len(lin_conds)-1])
-    
-    print('Bounds filters removed ' + str(rm_by_bounds) + ' shots out of ' + str(len(all_events))+' total shots.')
-    print('Linearity filters removed ' + str(rm_by_lin) + ' shots out of ' + str(len(all_events))+' total shots.')
-    print('The combined filters removed ' + str(len(all_events)-len(really_good_shots[-1])) + ' shots out of ' +str(len(all_events)) +' total shots.')
-    print('')
+    if not suspress_output:
+        print('Bounds filters removed ' + str(rm_by_bounds) + ' shots out of ' + str(len(all_events))+' total shots.')
+        print('Linearity filters removed ' + str(rm_by_lin) + ' shots out of ' + str(len(all_events))+' total shots.')
+        print('The combined filters removed ' + str(len(all_events)-len(really_good_shots[-1])) + ' shots out of ' +str(len(all_events)) +' total shots.')
+        print('')
 
     return conditions
 

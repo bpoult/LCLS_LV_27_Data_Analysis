@@ -53,8 +53,6 @@ class RawData:
         processed_data.changeValue(eventIDs=raw.eventIDs[combined_conditions],
                                    high_diode_us=raw.high_diode_us[combined_conditions],
                                    low_diode_us=raw.low_diode_us[combined_conditions],
-                                   xrt_intensity=raw.xrt_intensity[combined_conditions],
-                                   epix_intensity=raw.epix_intensity[combined_conditions],
                                    scan_name=raw.scan_name,
                                    epix_motor=raw.epix_motor,
                                    save_dir=raw.save_dir,

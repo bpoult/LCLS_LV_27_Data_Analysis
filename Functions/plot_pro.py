@@ -7,25 +7,21 @@ import sys
 import numpy as np
 import psana as ps
 import pickle
-import random
 
 
-def check_SN(pro_data,plot_on,fraction):
+def check_SN(pro_data,plot_on):
+
+    epix = pro_data.epix_windowed
+    xrt = pro_data.xrt_based
+    resid = np.subtract(epix,xrt)
     if plot_on:
-        number_shots = pro_data.eventIDs.shape[0]
-        random_xrt = random.sample(pro_data.xrt_based,number_shots/fraction)
-        random_epix = random.sample(pro_data.epix_windowed,number_shots/fraction)
-
-        resid_array = []
-        scatter_val =[]
-        for i in range(0,len(random_epix)):
-            resid = abs(random_epix[i]-random_xrt[i])
-            resid_array.append(resid)
-            scatter_val.append(np.sum(np.mean(resid_array[0:i+1],0)))
+        resid_rand = resid[np.random.choice(resid.shape[0], np.int64(epix.shape[0]), replace=False)]
+        loop_over = np.append(np.arange(100,len(resid),100,dtype=int),len(resid))
         plt.figure()
-        plt.scatter(range(0,len(random_epix)),scatter_val)
+        for i in loop_over:
+            plt.scatter(i,np.std(np.mean(resid_rand[0:i],0)),1.5,c='k')
         plt.xlabel('# shots in avg')
-        plt.ylabel('Sum of averaged residuals')
-        plt.title('S/N estimation')
+        plt.ylabel('STD of residual')
+        plt.title('Shot Noise for ' +str(epix.shape[0])+' total shots')
         plt.show()
-    return
+    return resid
