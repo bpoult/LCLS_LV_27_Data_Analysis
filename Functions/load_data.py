@@ -27,6 +27,8 @@ def load_data(save_dir,scan_name,ds_string, epix_roi, xrt_roi):
     high_diode_us_events = []
     photon_energies = []
     pulse_energies = []
+    fluo_diode_ds_events = []
+    other_diode_ds_events = []
     i = 0
 
     epix_roiYMin = epix_roi[2]
@@ -55,18 +57,23 @@ def load_data(save_dir,scan_name,ds_string, epix_roi, xrt_roi):
         epix_data = np.rint(epix_evt[0, epix_roiXMin:epix_roiXMax, epix_roiYMin:epix_roiYMax] / keV)
         epix_data[epix_data < 0.0] = 0.0
         epix_roiSum += epix_data
-        low_diode_us_evt = -1.0 * diodes[8] * 13.0  # /0.12230 #scale by 50 micron Fe foil transmission at 7 keV
-        high_diode_us_evt = (-1.0 * diodes[12]) - low_diode_us_evt
-
+        low_diode_us_evt = -1.0 * diodes[8] #* 13.0  # /0.12230 #scale by 50 micron Fe foil transmission at 7 keV
+        high_diode_us_evt = (-1.0 * diodes[12])# - low_diode_us_evt
+        
+        fluo_diode_ds_evt = -1.0 * diodes[15]
+        other_diode_ds_evt = -1.0 * diodes[11]
+        
         eventIDs.append(nevent)
         photon_energies.append(photonEnergy)
         pulse_energies.append([fee_evt.f_11_ENRC(),fee_evt.f_21_ENRC(),fee_evt.f_63_ENRC()])
         low_diode_us_events.append(low_diode_us_evt)
         high_diode_us_events.append(high_diode_us_evt)
+        fluo_diode_ds_events.append(fluo_diode_ds_evt)
+        other_diode_ds_events.append(other_diode_ds_evt)
         epix_events.append(np.sum(np.squeeze(epix_data), 0))
         xrt_events.append(xrt_evt.hproj()[XRTMin:XRTMax])
         i += 1
-        print('Loading: ...  Currently on shot: ' + str(i), end="\r", flush=True)
+        print('Loading run '+scan_name+' : ...  Currently on shot: ' + str(i), end="\r", flush=True)
         
     elapsed_time = (time.time() - start)
     print('Data loaded in ' + str(np.round(elapsed_time, 1)) + ' seconds.')
@@ -85,6 +92,8 @@ def load_data(save_dir,scan_name,ds_string, epix_roi, xrt_roi):
                             pulse_energies_fee = pulse_energies,
                             low_diode_us=low_diode_us_events,
                             high_diode_us=high_diode_us_events,
+                            fluo_diode_ds=fluo_diode_ds_events,
+                            other_diode_ds=other_diode_ds_events,
                             epix_spectrum=epix_events,
                             xrt_spectrum=xrt_events,
                             avg_epix_2d=np.asarray(epix_roiSum/i),

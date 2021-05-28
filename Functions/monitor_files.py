@@ -14,9 +14,9 @@ import pickle
 import psana as ps
 import numpy as np
 from .load_data import load_data
-def monitor_and_process(save_dir,xtc_smd_dir,load_data_input):
+def monitor_and_process(xtc_smd_dir,load_data_input):
 #ds = ps.DataSource(dir)
-    ignore_runs = set([1,2])
+    ignore_runs = set([1,2,3,4,5,6,7,8,9])
 
 #     if os.path.exists(save_dir + 'savedSet.pkl'):
 #         with open(save_dir + 'savedSet.pkl','rb') as f:
@@ -36,16 +36,14 @@ def monitor_and_process(save_dir,xtc_smd_dir,load_data_input):
 #     with open(save_dir + 'savedSet.pkl','wb') as f:
 #         pickle.dump(savedSet,f)
 #     f.close #save new run names in a pickle file
-    if nameSet:
-        newList = list(nameSet)
-        newList.sort()
-        for i in range(0,len(newList)):
-            scan_name = 'run_' + str(newList[i])
-            if not os.path.exists(load_data_input[0] + scan_name + "/" + "rawdata.pkl"):
-                ds_string = 'exp=cxix46119:run='+str(newList[i])+':smd'
-                raw_data = load_data(load_data_input[0],scan_name,ds_string,load_data_input[1],load_data_input[2])
-            else: 
-                print('No new runs. Last run processed: ' +str(newList[-1])+' | ' + str(datetime.datetime.now()), end="\r", flush=True)
+    newList = list(nameSet)
+    for i in range(0,len(newList)):
+        scan_name = 'run_' + str(newList[i])
+        if not os.path.exists(load_data_input[0] + scan_name + "/" + "rawdata.pkl"):
+            ds_string = 'exp=cxilv2718:run='+str(newList[i])+':smd'
+            raw_data = load_data(load_data_input[0],scan_name,ds_string,load_data_input[1],load_data_input[2])
+        else: 
+            print('No new runs. Last run processed: ' +str(newList[-1])+' | ' + str(datetime.datetime.now()))
 
     
     #else : 

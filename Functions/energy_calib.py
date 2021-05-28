@@ -17,9 +17,9 @@ def energy_calib(calibration,save_cal):
     m_epix, b_epix = np.polyfit(epix_pix, keV_epix, 1)
     
     epix_motor = []
-    ds_list = [ps.DataSource('exp=cxix46119:run='+str(calib[6][i])+':smd') for i in range(0,len(calib[6]))]
+    ds_list = [ps.DataSource('exp=cxilv2718:run='+str(calib[6][i])+':smd') for i in range(0,len(calib[6]))]
     for i in range(0,len(ds_list)):
-        ds = ps.DataSource('exp=cxix46119:run='+str(calib[6][i])+':smd')
+        ds = ps.DataSource('exp=cxilv2718:run='+str(calib[6][i])+':smd')
         det = ps.Detector('CXI:DG2:MMS:10.RBV')
         ds.events().__next__()
         epix_motor.append(round(det(),5))

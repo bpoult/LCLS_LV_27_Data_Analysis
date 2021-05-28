@@ -58,7 +58,7 @@ def plot_one_run(processed_data,plot_on):
         
 def plot_average(pro_datas,plot_on):
     
-    shots_array = [pro_datas[i].eventIDs.shape[0] for i in range(0,len(pro_datas)]
+    shots_array = [pro_datas[i].eventIDs.shape[0] for i in range(0,len(pro_datas))]
     total_shots = np.sum(shots_array)
     energy = pro_datas[0].epix_energy_windowed
     epix_I_array = [np.mean(pro_datas[i].epix_intensity,0) for i in range(0,len(pro_datas))]
