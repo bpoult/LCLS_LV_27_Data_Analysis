@@ -95,9 +95,53 @@ def lin_filter(raw_data,filt_param,bounds_conds):
         plt.show()
     return condition
 
-def rms_filter(raw_data,filt_param):
+def rms_filter(processed_data,filt_param):
+    total_I_epix = processed_data.epix_intensity
+    total_I_xrt = processed_data.xrt_intensity
+    energy = processed_data.epix_energy_windowed
+    events = processed_data.eventIDs
+    epix = processed_data.epix_windowed
+    xrt = processed_data.xrt_based
+    epix_avg = np.mean(epix,0)
+    xrt_avg = np.mean(xrt,0)
 
-    parameters = filt_param
+    epix_norm = epix/np.max(epix_avg)
+    xrt_norm = xrt/np.max(xrt_avg)
+    epix_avg_norm = epix_avg/np.max(epix_avg)
+    xrt_avg_norm = xrt_avg/np.max(xrt_avg)
 
-    condition = 'tbd'
-    return condition
+
+    epix_rms = np.sqrt(np.mean(np.subtract(epix_avg_norm,epix_norm)**2,1))
+    xrt_rms = np.sqrt(np.mean(np.subtract(xrt_avg_norm,xrt_norm)**2,1))
+
+    max_rms_epix = filt_param[0][0]
+    max_rms_xrt = filt_param[0][1]
+    rms_cond_epix = epix_rms < max_rms_epix
+    rms_cond_xrt = xrt_rms < max_rms_xrt
+    condition = np.logical_and(rms_cond_epix,rms_cond_xrt)
+    
+    
+    if np.logical_and(filt_param[2] is False,filt_param[1] is False):
+        return condition
+    if np.logical_and(filt_param[2] is False, processed_data.scan_name == 'run_'+str(filt_param[1])):
+        plt.figure()
+        _, bins, _ = plt.hist(epix_rms, 100, label='xrt')
+        _ = plt.hist(xrt_rms, bins, rwidth=.5, label='epix')
+        plt.legend()
+        plt.title('RMSE distribution for each spectrometer | ' + str(processed_data.scan_name))
+        plt.xlabel('RMSE')
+        plt.ylabel('# shots')
+        plt.show()
+        
+        return condition
+    if filt_param[2]:
+        plt.figure()
+        _, bins, _ = plt.hist(epix_rms, 100, label='xrt')
+        _ = plt.hist(xrt_rms, bins, rwidth=.5, label='epix')
+        plt.legend()
+        plt.title('RMSE distribution for each spectrometer | ' + str(processed_data.scan_name))
+        plt.xlabel('RMSE')
+        plt.ylabel('# shots')
+        plt.show()     
+        return condition
+  
