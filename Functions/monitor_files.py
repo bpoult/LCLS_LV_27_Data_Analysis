@@ -7,7 +7,8 @@ Created on Wed May 26 13:41:16 2021
 """
 #         raw_data = load_data.load_data(save_dir,scan_name,ds_string,epix_roi,xrt_roi)
 
-import time
+
+import datetime
 import os
 import pickle
 import psana as ps
@@ -44,7 +45,7 @@ def monitor_and_process(save_dir,xtc_smd_dir,load_data_input):
                 ds_string = 'exp=cxix46119:run='+str(newList[i])+':smd'
                 raw_data = load_data(load_data_input[0],scan_name,ds_string,load_data_input[1],load_data_input[2])
             else: 
-                print('No new runs')
+                print('No new runs. Last run processed: ' +str(newList[-1])+' | ' + str(datetime.datetime.now()), end="\r", flush=True)
 
     
     #else : 

@@ -95,7 +95,7 @@ def lin_filter(raw_data,filt_param,bounds_conds):
         plt.show()
     return condition
 
-def rms_filter(processed_data,filt_param,suspress_output):
+def rms_filter(processed_data,filt_param,suppress_output):
     total_I_epix = processed_data.epix_intensity
     total_I_xrt = processed_data.xrt_intensity
     energy = processed_data.epix_energy_windowed
@@ -121,15 +121,14 @@ def rms_filter(processed_data,filt_param,suspress_output):
     rms_cond_combined = np.logical_and(rms_cond_epix,rms_cond_xrt)
     conditions = [rms_cond_epix,rms_cond_xrt,rms_cond_combined]
     
-    if not suspress_output:
-        print('RMSE filter information for run ' + str(processed_data.scan_name))
+    if not suppress_output:
+        print('RMSE filter information for ' + str(processed_data.scan_name))
         print('The epix rmse condition removed ' + str(rms_cond_epix.shape[0] - rms_cond_epix.sum()) +' out of ' + str(events.shape[0]) + ' shots.')
         print('The xrt rmse condition removed ' + str(rms_cond_xrt.shape[0] - rms_cond_xrt.sum()) +' out of ' + str(events.shape[0]) + ' shots.')
         print('Both rmse conditions removed ' + str(rms_cond_combined.shape[0] - rms_cond_combined.sum()) +' out of ' + str(events.shape[0]) + ' shots.')
         print('')
-    
-    if np.logical_and(filt_param[2] is False,filt_param[1] is False):
-        return conditions ,epix_rms
+        return conditions
+
     if np.logical_and(filt_param[2] is False, processed_data.scan_name == 'run_'+str(filt_param[1])):
         print('RMSE filter information for run ' + str(processed_data.scan_name))
         print('The epix rmse condition removed ' + str(rms_cond_epix.shape[0] - rms_cond_epix.sum()) +' out of ' + str(events.shape[0]) + ' shots.')
@@ -156,4 +155,22 @@ def rms_filter(processed_data,filt_param,suspress_output):
         plt.ylabel('# shots')
         plt.show()     
         return conditions
-  
+    if np.logical_and(filt_param[2] is False,suppress_output):
+        return conditions
+def apply_rms_filter(processed_data,condition):
+    
+    processed_data.changeValue(eventIDs=processed_data.eventIDs[condition],
+                    high_diode_us=processed_data.high_diode_us[condition],
+                    low_diode_us=processed_data.low_diode_us[condition],
+                    xrt_intensity=processed_data.xrt_intensity[condition],
+                    epix_intensity=processed_data.epix_intensity[condition],
+                    epix_windowed=processed_data.epix_windowed[condition],
+                    xrt_windowed=processed_data.xrt_windowed[condition],
+                    xrt_red_res=processed_data.xrt_red_res[condition],
+                    xrt_based=processed_data.xrt_based[condition])
+    
+    return processed_data
+
+
+
+

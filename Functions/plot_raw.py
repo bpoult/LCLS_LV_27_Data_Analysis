@@ -12,28 +12,13 @@ def plot_raw(datas, plot_one, x_axis, on_off,calibration_file):
     if not on_off:
         print('Raw Data plotting is turned off.')
         return
-    
+
     runs = [datas[i].scan_name for i in range(0, len(datas))]
-    events_array = []
-    epix_array = []
-    xrt_array = []
-    epix_rois = []
-    xrt_rois = []
-    for i in range(0,len(datas)):
-        if not datas[i].eventIDs:
-            continue
-        events_array.append(datas[i].eventIDs)
-        epix_array.append(np.mean(datas[i].epix_spectrum, 0))
-        xrt_array.append(np.mean(datas[i].xrt_spectrum,0))
-        epix_rois.append(datas[i].epix_roi)
-        xrt_rois.append(datas[i].xrt_roi)
-    
-    events_array = np.asarray(events_array)
-    epix_array = np.asarray(epix_array)
-    xrt_array = np.asarray(xrt_array)
-    epix_rois = np.asarray(epix_rois)
-    xrt_rois = np.asarray(xrt_rois)
-    
+    epix_array = np.asarray([np.mean(datas[i].epix_spectrum, 0) for i in range(0, len(datas))], dtype=object)
+    xrt_array = np.asarray([np.mean(datas[i].xrt_spectrum,0) for i in range(0, len(datas))], dtype=object)
+    epix_rois = [datas[i].epix_roi for i in range(0, len(datas))]
+    xrt_rois = [datas[i].xrt_roi for i in range(0, len(datas))]
+
     if not any(x == 'run_' + str(plot_one) for x in runs) and plot_one is not False:
         print('The run you want to plot individually is not in the input runs')
         return
