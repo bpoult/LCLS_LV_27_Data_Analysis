@@ -41,7 +41,8 @@ class processed_data_class:
     def scale_spectrometers(self,probe_run):
         processed_data = self
         if np.logical_and(processed_data.scan_name == 'run_' + str(probe_run[0]),probe_run[1]):
-            print(processed_data.scan_name)
+            print('New spec scaling made from' + processed_data.scan_name)
+            print('')
             probe_run = [probe_run[0],False]
             epix_sum = np.mean(processed_data.epix_windowed, 0)
             xrt_sum = np.mean(processed_data.xrt_red_res, 0)

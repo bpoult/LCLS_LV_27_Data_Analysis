@@ -95,7 +95,7 @@ def lin_filter(raw_data,filt_param,bounds_conds):
         plt.show()
     return condition
 
-def rms_filter(processed_data,filt_param):
+def rms_filter(processed_data,filt_param,suspress_output):
     total_I_epix = processed_data.epix_intensity
     total_I_xrt = processed_data.xrt_intensity
     energy = processed_data.epix_energy_windowed
@@ -118,12 +118,24 @@ def rms_filter(processed_data,filt_param):
     max_rms_xrt = filt_param[0][1]
     rms_cond_epix = epix_rms < max_rms_epix
     rms_cond_xrt = xrt_rms < max_rms_xrt
-    condition = np.logical_and(rms_cond_epix,rms_cond_xrt)
+    rms_cond_combined = np.logical_and(rms_cond_epix,rms_cond_xrt)
+    conditions = [rms_cond_epix,rms_cond_xrt,rms_cond_combined]
     
+    if not suspress_output:
+        print('RMSE filter information for run ' + str(processed_data.scan_name))
+        print('The epix rmse condition removed ' + str(rms_cond_epix.shape[0] - rms_cond_epix.sum()) +' out of ' + str(events.shape[0]) + ' shots.')
+        print('The xrt rmse condition removed ' + str(rms_cond_xrt.shape[0] - rms_cond_xrt.sum()) +' out of ' + str(events.shape[0]) + ' shots.')
+        print('Both rmse conditions removed ' + str(rms_cond_combined.shape[0] - rms_cond_combined.sum()) +' out of ' + str(events.shape[0]) + ' shots.')
+        print('')
     
     if np.logical_and(filt_param[2] is False,filt_param[1] is False):
-        return condition
+        return conditions ,epix_rms
     if np.logical_and(filt_param[2] is False, processed_data.scan_name == 'run_'+str(filt_param[1])):
+        print('RMSE filter information for run ' + str(processed_data.scan_name))
+        print('The epix rmse condition removed ' + str(rms_cond_epix.shape[0] - rms_cond_epix.sum()) +' out of ' + str(events.shape[0]) + ' shots.')
+        print('The xrt rmse condition removed ' + str(rms_cond_xrt.shape[0] - rms_cond_xrt.sum()) +' out of ' + str(events.shape[0]) + ' shots.')
+        print('Both rmse conditions removed ' + str(rms_cond_combined.shape[0] - rms_cond_combined.sum()) +' out of ' + str(events.shape[0]) + ' shots.')
+        print('')
         plt.figure()
         _, bins, _ = plt.hist(epix_rms, 100, label='xrt')
         _ = plt.hist(xrt_rms, bins, rwidth=.5, label='epix')
@@ -133,7 +145,7 @@ def rms_filter(processed_data,filt_param):
         plt.ylabel('# shots')
         plt.show()
         
-        return condition
+        return conditions
     if filt_param[2]:
         plt.figure()
         _, bins, _ = plt.hist(epix_rms, 100, label='xrt')
@@ -143,5 +155,5 @@ def rms_filter(processed_data,filt_param):
         plt.xlabel('RMSE')
         plt.ylabel('# shots')
         plt.show()     
-        return condition
+        return conditions
   
