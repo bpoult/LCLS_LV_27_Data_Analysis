@@ -1,3 +1,6 @@
+# Written by Ben Poulter (Khalil Group, University of Washington), May 2021
+# For LV27 LCLS Beamtime.
+
 import sys
 import os
 import numpy as np
@@ -23,7 +26,7 @@ def load_data(save_dir,scan_name,ds_string, epix_roi, xrt_roi):
     low_diode_us_events = []
     high_diode_us_events = []
     photon_energies = []
-    pulse_intensities = []
+    pulse_energies = []
     i = 0
 
     epix_roiYMin = epix_roi[2]
@@ -57,29 +60,40 @@ def load_data(save_dir,scan_name,ds_string, epix_roi, xrt_roi):
 
         eventIDs.append(nevent)
         photon_energies.append(photonEnergy)
-        pulse_intensities.append(fee_evt.f_11_ENRC())
+        pulse_energies.append([fee_evt.f_11_ENRC(),fee_evt.f_21_ENRC(),fee_evt.f_63_ENRC()])
         low_diode_us_events.append(low_diode_us_evt)
         high_diode_us_events.append(high_diode_us_evt)
         epix_events.append(np.sum(np.squeeze(epix_data), 0))
         xrt_events.append(xrt_evt.hproj()[XRTMin:XRTMax])
         i += 1
+        print('Loading: ...  Currently on shot: ' + str(i), end="\r", flush=True)
+
     elapsed_time = (time.time() - start)
     print('Data loaded in ' + str(np.round(elapsed_time, 1)) + ' seconds.')
     print(str(nevent - i) + ' out of ' + str(nevent) + ' shots had empty values.')
     eventIDs = np.asarray(eventIDs)
     photon_energies = np.asarray(photon_energies)
-    pulse_intensities = np.asarray(pulse_intensities)
+    pulse_energies = np.asarray(pulse_energies)
     low_diode_us_events = np.asarray(low_diode_us_events)
     high_diode_us_events = np.asarray(high_diode_us_events)
     epix_events = np.asarray(epix_events)
     xrt_events = np.asarray(xrt_events)
-
-    RawData.changeValue(eventIDS = eventIDs, photon_energies=photon_energies,I0_fee = pulse_intensities,
-                         low_diode_us=low_diode_us_events,high_diode_us=high_diode_us_events, epix_spectrum=epix_events,
-                         xrt_spectrum=xrt_events,avg_epix_2d=np.asarray(epix_roiSum/i),xrt_intensity=np.sum(xrt_events,1),
-                         epix_intensity=np.sum(epix_events,1),scan_name=scan_name,epix_roi=epix_roi,xrt_roi=xrt_roi,
-                        save_dir=save_dir,ds_string=ds_string)
-
+    epix_motor = ps.Detector('CXI:DG2:MMS:10.RBV').__call__()
+    RawData.changeValue(eventIDs = eventIDs,
+                        photon_energies=photon_energies,
+                        pulse_energies_fee = pulse_energies,
+                        low_diode_us=low_diode_us_events,
+                        high_diode_us=high_diode_us_events,
+                        epix_spectrum=epix_events,
+                        xrt_spectrum=xrt_events,
+                        avg_epix_2d=np.asarray(epix_roiSum/i),
+                        xrt_intensity=np.sum(xrt_events,1),
+                        epix_intensity=np.sum(epix_events,1),
+                        scan_name=scan_name,
+                        epix_roi=epix_roi,xrt_roi=xrt_roi,
+                        save_dir=save_dir,
+                        ds_string=ds_string,
+                        epix_motor=round(epix_motor,5))
     if not os.path.isdir(save_dir + scan_name):
         try:
             os.mkdir(save_dir + scan_name)
@@ -91,3 +105,20 @@ def load_data(save_dir,scan_name,ds_string, epix_roi, xrt_roi):
         pickle.dump(RawData, f)
 
     return RawData
+
+def add_cal_info(raw_data,to_cal_file):
+    if not os.path.exists(to_cal_file[0]+to_cal_file[1]+'.pkl'):
+        return
+    else:
+        with open(to_cal_file[0] + to_cal_file[1] +'.pkl', "rb") as f:
+            calibration = pickle.load(f)
+        if not calibration[9] == raw_data.epix_motor:
+            return
+        if hasattr(raw_data,'calibration_info'):
+            previous_cal = raw_data.calibration_info[5][1]
+            raw_data.changeValue(calibration_info=calibration,previous_cal=previous_cal)   
+        else: 
+            raw_data.changeValue(calibration_info=calibration)
+    with open(raw_data.save_dir + raw_data.scan_name + '/' + "rawdata.pkl", "wb") as f:
+        pickle.dump(raw_data, f)
+        
