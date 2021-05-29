@@ -28,10 +28,9 @@ def check_SN(pro_data,plot_on):
 
 def plot_one_run(processed_data,plot_on):
     energy = processed_data.epix_energy_windowed
-    epix_I = np.mean(processed_data.epix_intensity)
-    xrt_I = np.mean(processed_data.xrt_intensity)
-    epix = processed_data.epix_windowed/epix_I
-    xrt = processed_data.xrt_based/xrt_I
+    low_diode_intensity = processed_data.low_diode_us
+    epix = processed_data.epix_windowed
+    xrt = processed_data.xrt_based
     resid = np.subtract(epix,xrt)
     deltaT_T = np.divide(resid,xrt)
 

@@ -36,18 +36,21 @@ def filtering(raw_data, filters,suspress_output):
             if i is 0:
                 if suspress_output:
                     print('Filter info for ' + raw_data.scan_name + ':')
+                    
                 print('Filter' + str(i) + ' removed ' + str(len(all_events)-len(really_good_shots[i])) + ' unique shots out of ' +str(len(all_events)) + ' total shots.')
+                
             else:
                 print('Filter' + str(i) + ' removed ' + str(len(really_good_shots[i-1])-len(really_good_shots[i])) + ' unique shots out of ' +str(len(all_events)) + ' total shots.')
             if i is len(filters) -1:
                 print('The combined filters removed ' + str(len(all_events)-len(really_good_shots[-1])) + ' shots out of ' +str(len(all_events)) +' total shots.')
-                print('')
+#                 print('')
     rm_by_bounds = len(all_events)-len(really_good_shots[len(bounds_cond)-1])
     rm_by_lin = len(really_good_shots[len(bounds_cond)-1])-len(really_good_shots[len(bounds_cond)+len(lin_conds)-1])
     if not suspress_output:
+        print('')
         print('Bounds filters removed ' + str(rm_by_bounds) + ' shots out of ' + str(len(all_events))+' total shots.')
         print('Linearity filters removed ' + str(rm_by_lin) + ' shots out of ' + str(len(all_events))+' total shots.')
-        print('The combined filters removed ' + str(len(all_events)-len(really_good_shots[-1])) + ' shots out of ' +str(len(all_events)) +' total shots.')
+        print('The combined filters removed ' + str(len(all_events)-len(really_good_shots[-1])) + ' shots out of ' +str(len(all_events)) +' total shots | '+ str((len(all_events)-len(really_good_shots[-1]))/len(all_events))+' %')
         print('')
 
     return conditions
@@ -81,16 +84,25 @@ def bounds_filter(raw_data,filt_param):
 def lin_filter(raw_data,filt_param,bounds_conds):
     var_x = getattr(raw_data,filt_param[2][0])
     var_y = getattr(raw_data,filt_param[2][1])
-    var_x = var_x/np.max(var_x)
-    var_y = var_y/np.max(var_y)
-    lin_fit = np.polyfit(var_x[bounds_conds], var_y[bounds_conds], 1)
-    cond_lin_high = var_y < var_x * lin_fit[0] + lin_fit[1] + filt_param[2][2]
-    cond_lin_low = var_y > var_x * lin_fit[0] + lin_fit[1] - filt_param[2][2]
-    condition = cond_lin_high & cond_lin_low
+    scale = np.max([var_x,var_y])
+    if type(bounds_conds)==type(np.bool_(True)):
+        bounds_conds = np.full(len(var_x),True)
+    if filt_param[2][3]:
+        m, _, _, _ = np.linalg.lstsq(var_x[bounds_conds][:,np.newaxis],var_y[bounds_conds])
+        cond_lin_high = var_y < var_x * m + filt_param[2][2]*scale
+        cond_lin_low = var_y > var_x * m - filt_param[2][2]*scale
+        condition = cond_lin_high & cond_lin_low
+    else:
+        var_x = var_x
+        var_y = var_y
+        lin_fit = np.polyfit(var_x[bounds_conds], var_y[bounds_conds], 1)
+        cond_lin_high = var_y < var_x * lin_fit[0] + lin_fit[1] + filt_param[2][2]*scale
+        cond_lin_low = var_y > var_x * lin_fit[0] + lin_fit[1] - filt_param[2][2]*scale
+        condition = cond_lin_high & cond_lin_low
     if np.logical_and(filt_param[3][0],'run_'+str(filt_param[3][1])==getattr(raw_data,'scan_name')):
         plt.figure()
-        plt.scatter(var_x,var_y,alpha=0.95)
-        plt.scatter(var_x[condition],var_y[condition],alpha=0.05)
+        plt.scatter(var_x[bounds_conds],var_y[bounds_conds],alpha=0.95)
+        plt.scatter(var_x[np.logical_and(bounds_conds,condition)],var_y[np.logical_and(bounds_conds,condition)],alpha=0.05)
         plt.title(filt_param[1]+' '+filt_param[2][0] +' vs '+ filt_param[2][1])
         plt.show()
     return condition

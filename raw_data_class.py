@@ -47,22 +47,32 @@ class RawData:
     def make_pro_data(self,conditions,filters):
         processed_data = PDC()
         raw=self
-        
         combined_conditions = np.asarray(conditions).all(axis=0)
+
+        epix=raw.epix_windowed[combined_conditions]
+        xrt = raw.xrt_red_res[combined_conditions]
+        low_diode_us=raw.low_diode_us[combined_conditions],
+        high_diode_us=raw.high_diode_us[combined_conditions]
         
+        epix_norm = epix/low_diode_us
+        xrt_norm = xrt/low_diode_us
         processed_data.changeValue(eventIDs=raw.eventIDs[combined_conditions],
-                                   high_diode_us=raw.high_diode_us[combined_conditions],
-                                   low_diode_us=raw.low_diode_us[combined_conditions],
+                                   high_diode_us=high_diode_us,
+                                   low_diode_us=low_diode_us,
+                                   fluo_diode_ds= np.asarray(raw.fluo_diode_ds)[combined_conditions],
+                                   other_diode_ds = np.asarray(raw.other_diode_ds)[combined_conditions],
                                    scan_name=raw.scan_name,
                                    epix_motor=raw.epix_motor,
                                    save_dir=raw.save_dir,
                                    calibration_info=raw.calibration_info,
                                    previous_cal=raw.previous_cal,
                                    epix_energy_windowed=raw.epix_energy_windowed,
-                                   epix_windowed=raw.epix_windowed[combined_conditions],
+                                   epix_windowed=epix,
                                    xrt_energy_windowed=raw.xrt_energy_windowed,
                                    xrt_windowed=raw.xrt_windowed[combined_conditions],
-                                   xrt_red_res=raw.xrt_red_res[combined_conditions],
+                                   xrt_red_res=xrt,
+                                   epix_norm=epix_norm,
+                                   xrt_norm=xrt_norm,
                                    filters=filters)
         if not (raw.eventIDs[combined_conditions] == processed_data.eventIDs).all():
             print('Something in the filter went wrong... The events that passed the filter do not match the events in the processed data')
@@ -75,7 +85,7 @@ class RawData:
 
         with open(processed_data.save_dir + processed_data.scan_name + '/' + "pro_data.pkl", "wb") as f:
             pickle.dump(processed_data, f)
-        
+            f.close()
         return processed_data
         
 

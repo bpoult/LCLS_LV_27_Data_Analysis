@@ -57,8 +57,8 @@ def load_data(save_dir,scan_name,ds_string, epix_roi, xrt_roi):
         epix_data = np.rint(epix_evt[0, epix_roiXMin:epix_roiXMax, epix_roiYMin:epix_roiYMax] / keV)
         epix_data[epix_data < 0.0] = 0.0
         epix_roiSum += epix_data
-        low_diode_us_evt = -1.0 * diodes[8] #* 13.0  # /0.12230 #scale by 50 micron Fe foil transmission at 7 keV
-        high_diode_us_evt = (-1.0 * diodes[12])# - low_diode_us_evt
+        low_diode_us_evt = -1.0 * diodes[8] /0.046#* 13.0  # /0.12230 #scale by 50 micron Fe foil transmission at 7 keV
+        high_diode_us_evt = (-1.0 * diodes[12])-low_diode_us_evt# - low_diode_us_evt
         
         fluo_diode_ds_evt = -1.0 * diodes[15]
         other_diode_ds_evt = -1.0 * diodes[11]
@@ -87,13 +87,15 @@ def load_data(save_dir,scan_name,ds_string, epix_roi, xrt_roi):
         epix_events = np.asarray(epix_events)
         xrt_events = np.asarray(xrt_events)
         epix_motor = ps.Detector('CXI:DG2:MMS:10.RBV').__call__()
+        fluo_diode_ds = np.asarray(fluo_diode_ds_events)
+        other_diode_ds = np.asarray(other_diode_ds_events)
         RawData.changeValue(eventIDs = eventIDs,
                             photon_energies=photon_energies,
                             pulse_energies_fee = pulse_energies,
                             low_diode_us=low_diode_us_events,
                             high_diode_us=high_diode_us_events,
-                            fluo_diode_ds=fluo_diode_ds_events,
-                            other_diode_ds=other_diode_ds_events,
+                            fluo_diode_ds=fluo_diode_ds,
+                            other_diode_ds=other_diode_ds,
                             epix_spectrum=epix_events,
                             xrt_spectrum=xrt_events,
                             avg_epix_2d=np.asarray(epix_roiSum/i),
@@ -103,7 +105,7 @@ def load_data(save_dir,scan_name,ds_string, epix_roi, xrt_roi):
                             epix_roi=epix_roi,xrt_roi=xrt_roi,
                             save_dir=save_dir,
                             ds_string=ds_string,
-                            epix_motor=round(epix_motor,5))
+                            epix_motor=round(epix_motor,3))
     if not os.path.isdir(save_dir + scan_name):
         try:
             os.mkdir(save_dir + scan_name)
@@ -113,7 +115,7 @@ def load_data(save_dir,scan_name,ds_string, epix_roi, xrt_roi):
 
     with open(save_dir + scan_name + '/' + "rawdata.pkl", "wb") as f:
         pickle.dump(RawData, f)
-
+        f.close()
     return RawData
 
 def add_cal_info(raw_data,to_cal_file):

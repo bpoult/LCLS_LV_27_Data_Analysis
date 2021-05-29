@@ -22,7 +22,7 @@ def energy_calib(calibration,save_cal):
         ds = ps.DataSource('exp=cxilv2718:run='+str(calib[6][i])+':smd')
         det = ps.Detector('CXI:DG2:MMS:10.RBV')
         ds.events().__next__()
-        epix_motor.append(round(det(),5))
+        epix_motor.append(round(det(),3))
 
     if not all(x == epix_motor[0] for x in epix_motor):
         print('Your calibration scans have different epix motor positions.')

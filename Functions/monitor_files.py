@@ -39,12 +39,16 @@ def monitor_and_process(xtc_smd_dir,load_data_input):
     newList = list(nameSet)
     for i in range(0,len(newList)):
         scan_name = 'run_' + str(newList[i])
+        last_run_pro = newList[-1]
         if not os.path.exists(load_data_input[0] + scan_name + "/" + "rawdata.pkl"):
             ds_string = 'exp=cxilv2718:run='+str(newList[i])+':smd'
             raw_data = load_data(load_data_input[0],scan_name,ds_string,load_data_input[1],load_data_input[2])
-        else: 
-            print('No new runs. Last run processed: ' +str(newList[-1])+' | ' + str(datetime.datetime.now()))
-
+            last_run_pro = newList[i]
+            continue
+        last_run_pro = newList[-1]
+    if all([os.path.exists(load_data_input[0] + 'run_' + str(newList[i]) + "/" + "rawdata.pkl") for i in range(0,len(newList))]) is True:
+            print('No new runs. Last run processed: ' +str(last_run_pro)+' | ' + str(datetime.datetime.now()))
+            
     
     #else : 
     #    time.sleep(60) #checks again in n seconds
