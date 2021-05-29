@@ -41,8 +41,8 @@ def filtering(raw_data, filters,suspress_output):
                 
             else:
                 print('Filter' + str(i) + ' removed ' + str(len(really_good_shots[i-1])-len(really_good_shots[i])) + ' unique shots out of ' +str(len(all_events)) + ' total shots.')
-            if i is len(filters) -1:
-                print('The combined filters removed ' + str(len(all_events)-len(really_good_shots[-1])) + ' shots out of ' +str(len(all_events)) +' total shots.')
+            if np.logical_and(i is len(filters) -1,not suspress_output):
+                print('The combined filters removed ' + str(len(all_events)-len(really_good_shots[-1])) + ' shots out of ' +str(len(all_events)) +' total shots | '+ str(np.round(100*(len(all_events)-len(really_good_shots[-1]))/len(all_events),3))+' %')
 #                 print('')
     rm_by_bounds = len(all_events)-len(really_good_shots[len(bounds_cond)-1])
     rm_by_lin = len(really_good_shots[len(bounds_cond)-1])-len(really_good_shots[len(bounds_cond)+len(lin_conds)-1])
@@ -50,7 +50,7 @@ def filtering(raw_data, filters,suspress_output):
         print('')
         print('Bounds filters removed ' + str(rm_by_bounds) + ' shots out of ' + str(len(all_events))+' total shots.')
         print('Linearity filters removed ' + str(rm_by_lin) + ' shots out of ' + str(len(all_events))+' total shots.')
-        print('The combined filters removed ' + str(len(all_events)-len(really_good_shots[-1])) + ' shots out of ' +str(len(all_events)) +' total shots | '+ str((len(all_events)-len(really_good_shots[-1]))/len(all_events))+' %')
+        print('The combined filters removed ' + str(len(all_events)-len(really_good_shots[-1])) + ' shots out of ' +str(len(all_events)) +' total shots | '+ str(np.round(100*(len(all_events)-len(really_good_shots[-1]))/len(all_events),3))+' %')
         print('')
 
     return conditions
@@ -113,7 +113,7 @@ def rms_filter(processed_data,filt_param,suppress_output):
     energy = processed_data.epix_energy_windowed
     events = processed_data.eventIDs
     epix = processed_data.epix_windowed
-    xrt = processed_data.xrt_based
+    xrt = processed_data.xrt_based_norm
     epix_avg = np.mean(epix,0)
     xrt_avg = np.mean(xrt,0)
 
@@ -159,8 +159,8 @@ def rms_filter(processed_data,filt_param,suppress_output):
         return conditions
     if filt_param[2]:
         plt.figure()
-        _, bins, _ = plt.hist(epix_rms, 100, label='xrt')
-        _ = plt.hist(xrt_rms, bins, rwidth=.5, label='epix')
+        _, bins, _ = plt.hist(epix_rms, 100, label='epix')
+        _ = plt.hist(xrt_rms, bins, rwidth=.5, label='xrt')
         plt.legend()
         plt.title('RMSE distribution for each spectrometer | ' + str(processed_data.scan_name))
         plt.xlabel('RMSE')

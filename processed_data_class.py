@@ -38,22 +38,24 @@ class processed_data_class:
         return self.__dict__.keys()
 
 
-    def scale_spectrometers(self,probe_run):
+    def scale_spectrometers(self,probe_run,scaling):
         processed_data = self
         if np.logical_and(processed_data.scan_name == 'run_' + str(probe_run[0]),probe_run[1]):
             print('New spec scaling made from' + processed_data.scan_name)
             print('')
             probe_run = [probe_run[0],False]
-            epix_sum = np.mean(processed_data.epix_windowed, 0)
-            xrt_sum = np.mean(processed_data.xrt_red_res, 0)
+            epix_mean = np.mean(processed_data.epix_norm, 0)
+            xrt_mean = np.mean(processed_data.xrt_norm, 0)
 
-            scaling1 = np.max(xrt_sum) / np.max(epix_sum)
-            scaling2 = epix_sum / xrt_sum
-            scaling3 = scaling2 / np.max(scaling2)
-            spec_scale = scaling2
+            scaling1 = np.mean(np.divide(processed_data.epix_norm,processed_data.xrt_norm),0)
+            scaling2 = epix_mean / xrt_mean
+            if scaling:
+                spec_scale = scaling2
+            if not scaling:
+                spec_scale = scaling1
             with open(processed_data.calibration_info[5][0] + 'spec_scaled_'+str(probe_run[0])+'_'+processed_data.calibration_info[5][1] + '.pkl', 'wb') as f:
                 pickle.dump(spec_scale, f)
-            return probe_run
+            return probe_run,spec_scale
 
 
         if not os.path.exists(processed_data.calibration_info[5][0] + 'spec_scaled_'+str(probe_run[0])+'_'+processed_data.calibration_info[5][1] + '.pkl'):
@@ -61,10 +63,9 @@ class processed_data_class:
             return
         with open(processed_data.calibration_info[5][0] + 'spec_scaled_'+str(probe_run[0])+'_'+processed_data.calibration_info[5][1] + '.pkl','rb') as f:
             spec_scale = pickle.load(f)
-        xrt_based = np.asarray([spec_scale*processed_data.xrt_red_res[i] for i in range(0,len(processed_data.xrt_red_res))])
-        xrt_intensity = np.sum(xrt_based,1)
-        epix_intensity = np.sum(processed_data.epix_windowed,1)
-        processed_data.changeValue(xrt_based=xrt_based,xrt_intensity=xrt_intensity,epix_intensity=epix_intensity)
+        xrt_based_norm = np.asarray([spec_scale*processed_data.xrt_norm[i] for i in range(0,len(processed_data.xrt_norm))])
+#         xrt_based = np.asarray([spec_scale*processed_data.xrt_red_res[i] for i in range(0,len(processed_data.xrt_red_res))])
+        processed_data.changeValue(xrt_based_norm=xrt_based_norm)
         return
 
 

@@ -11,8 +11,8 @@ import pickle
 
 def check_SN(pro_data,plot_on):
 
-    epix = pro_data.epix_windowed
-    xrt = pro_data.xrt_based
+    epix = pro_data.epix_norm
+    xrt = pro_data.xrt_based_norm
     resid = np.subtract(epix,xrt)
     if plot_on:
         resid_rand = resid[np.random.choice(resid.shape[0], np.int64(epix.shape[0]), replace=False)]
@@ -28,9 +28,8 @@ def check_SN(pro_data,plot_on):
 
 def plot_one_run(processed_data,plot_on):
     energy = processed_data.epix_energy_windowed
-    low_diode_intensity = processed_data.low_diode_us
-    epix = processed_data.epix_windowed
-    xrt = processed_data.xrt_based
+    epix = processed_data.epix_norm
+    xrt = processed_data.xrt_based_norm
     resid = np.subtract(epix,xrt)
     deltaT_T = np.divide(resid,xrt)
 

@@ -51,11 +51,11 @@ class RawData:
 
         epix=raw.epix_windowed[combined_conditions]
         xrt = raw.xrt_red_res[combined_conditions]
-        low_diode_us=raw.low_diode_us[combined_conditions],
-        high_diode_us=raw.high_diode_us[combined_conditions]
+        low_diode_us=np.squeeze(raw.low_diode_us[combined_conditions])
+        high_diode_us=np.squeeze(raw.high_diode_us[combined_conditions])
         
-        epix_norm = epix/low_diode_us
-        xrt_norm = xrt/low_diode_us
+        epix_norm = np.asarray([epix[i]/low_diode_us[i] for i in range(0,len(epix))])
+        xrt_norm = np.asarray([xrt[i]/low_diode_us[i] for i in range(0,len(xrt))])
         processed_data.changeValue(eventIDs=raw.eventIDs[combined_conditions],
                                    high_diode_us=high_diode_us,
                                    low_diode_us=low_diode_us,
