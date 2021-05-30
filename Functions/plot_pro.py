@@ -7,6 +7,8 @@ import sys
 import numpy as np
 import psana as ps
 import pickle
+from .plot_average import gather_shots
+
 
 
 def check_SN(pro_data,plot_on):
@@ -90,7 +92,86 @@ def plot_average(pro_datas,plot_on):
         plt.ylabel('% difference')
         plt.title('\u0394 T / T')
 
+def plot_lots(pro_datas,input_vars):
+    #input_vars = [scans_to_plot,spec_cal_runs,plot_conds,plot_shotwise,plot_meanwise]
+    # Plot Conds : epix, xrt, resid, deltaT_T
+    scans_to_plot = input_vars[0]
+    spec_cal_runs = input_vars[1]
+    xrt_plot = input_vars[2][0]
+    epix_plot = input_vars[2][1]
+    resid_plot = input_vars[2][2]
+    deltaT_T_plot = input_vars[2][3]
+    plot_shotwise = input_vars[3]
+    plot_meanwise = input_vars[4]
+    runs = input_vars[5]
+    bootstrapped = input_vars[6]
+    energy = pro_datas[0].epix_energy_windowed
+        
+    scale_shots_xrt,scale_shots_epix,scale_shots_ids = gather_shots(pro_datas,[spec_cal_runs,1,runs])
+    scale = np.mean(scale_shots_epix,0)/np.mean(scale_shots_xrt,0)
+    
+    compare = [gather_shots(pro_datas,[scans_to_plot[i],1,runs]) for i in range(0,len(scans_to_plot))]
+    
+    epix_means = [np.mean(compare[i][1],0) for i in range(0,len(compare))]
+    xrt_means = [np.mean(scale*compare[i][0],0) for i in range(0,len(compare))]
 
+
+    if epix_plot:
+        plt.figure()
+        [plt.plot(energy,epix_means[i]) for i in range(0,len(epix_means))]
+        plt.legend((scans_to_plot))
+        plt.title('Epix Spectra Stacked')
+        plt.xlabel('energy, keV')
+        plt.show()
+        
+    if xrt_plot:
+        plt.figure()
+        [plt.plot(energy,xrt_means[i]) for i in range(0,len(xrt_means))]
+        plt.legend((scans_to_plot))
+        plt.title('XRT Spectra Stacked')
+        plt.xlabel('energy, keV')
+        plt.show()
+
+    if plot_meanwise:
+        resid_means =[epix_means[i]-xrt_means[i] for i in range(0,len(compare))]
+        deltaT_T_means =[(resid_means[i]/xrt_means[i]) for i in range(0,len(compare))]
+
+        if resid_plot:
+            plt.figure()
+            [plt.plot(energy,resid_means[i]) for i in range(0,len(resid_means))]
+            plt.legend((scans_to_plot))
+            plt.title('Residual | avg(epix)-avg(xrt)')
+            plt.xlabel('energy, keV')
+            plt.show()
+
+        if deltaT_T_plot:
+            plt.figure()
+            [plt.plot(energy,deltaT_T_means[i]) for i in range(0,len(deltaT_T_means))]
+            plt.legend((scans_to_plot))
+            plt.title('Delta T / T | (avg(epix)-avg(xrt))/avg(xrt)')
+            plt.xlabel('energy, keV')
+            plt.show()
+    
+    
+    if plot_shotwise:
+        resid_sbs = [compare[i][1]-compare[i][0]*scale for i in range(0,len(compare))]
+        deltaT_T_sbs = [(resid_sbs[i])/(compare[i][0]*scale) for i in range(0,len(compare))]        
+            
+        if resid_plot:
+            plt.figure()
+            [plt.plot(energy,np.mean(resid_sbs[i],0)) for i in range(0,len(resid_sbs))]
+            plt.legend((scans_to_plot))
+            plt.title('Residual | avg(epix-xrt) shotwise')
+            plt.xlabel('energy, keV')
+            plt.show()
+
+        if deltaT_T_plot:
+            plt.figure()
+            [plt.plot(energy,np.mean(deltaT_T_sbs[i],0)) for i in range(0,len(deltaT_T_sbs))]
+            plt.legend((scans_to_plot))
+            plt.title('Delta T / T | avg[(epix-xrt)/xrt] shotwise')
+            plt.xlabel('energy, keV')
+            plt.show()
 
 
 
