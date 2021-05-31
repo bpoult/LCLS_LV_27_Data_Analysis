@@ -40,8 +40,9 @@ class processed_data_class:
 
     def scale_spectrometers(self,probe_run,scaling):
         processed_data = self
+        print(probe_run)
         if np.logical_and(processed_data.scan_name == 'run_' + str(probe_run[0]),probe_run[1]):
-            print('New spec scaling made from' + processed_data.scan_name)
+            print('New spec scaling made from ' + processed_data.scan_name)
             print('')
             probe_run = [probe_run[0],False]
             epix_mean = np.mean(processed_data.epix_norm, 0)
@@ -56,7 +57,6 @@ class processed_data_class:
             with open(processed_data.calibration_info[5][0] + 'spec_scaled_'+str(probe_run[0])+'_'+processed_data.calibration_info[5][1] + '.pkl', 'wb') as f:
                 pickle.dump(spec_scale, f)
             return probe_run,spec_scale
-
 
         if not os.path.exists(processed_data.calibration_info[5][0] + 'spec_scaled_'+str(probe_run[0])+'_'+processed_data.calibration_info[5][1] + '.pkl'):
             print('There is no spec_scaling file saved for run ' + str(processed_data.scan_name))

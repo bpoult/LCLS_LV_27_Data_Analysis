@@ -21,3 +21,5 @@ def load_pro(scans_to_plot):
             print('You are trying to load a file that does not exist.')
             return
     return pro_datas
+
+

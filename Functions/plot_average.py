@@ -10,20 +10,26 @@ import pickle
 def gather_shots(pro_datas,input_vars):
     scans_to_average= input_vars[0]
     runs= input_vars[2]
-    idx = np.searchsorted(runs,scans_to_average) # runs
     if input_vars[1] is 0:
+        idx = np.searchsorted(runs,scans_to_average) # runs
         all_epix_shots = np.asarray([pro_datas[i].epix_norm[j] for i in idx for j in range(0,len(pro_datas[i].epix_norm))])
         all_xrt_shots = np.asarray([pro_datas[i].xrt_norm[j] for i in idx for j in range(0,len(pro_datas[i].xrt_norm))])
         all_xrt_shots_based = np.asarray([pro_datas[i].xrt_based_norm[j] for i in idx for j in range(0,len(pro_datas[i].xrt_based_norm))])
         shot_id = [[pro_datas[i].scan_name,pro_datas[i].eventIDs[j]] for i in idx for j in range(0,len(pro_datas[i].xrt_norm))]
         return all_xrt_shots,all_epix_shots,all_xrt_shots_based,shot_id
     if input_vars[1] is 1:
-        all_epix_shots = np.asarray([pro_datas[i].epix_norm[j] for i in idx for j in range(0,len(pro_datas[i].epix_norm))])
-        all_xrt_shots = np.asarray([pro_datas[i].xrt_norm[j] for i in idx for j in range(0,len(pro_datas[i].xrt_norm))])
-        shot_id = [[pro_datas[i].scan_name,pro_datas[i].eventIDs[j]] for i in idx for j in range(0,len(pro_datas[i].xrt_norm))]
+        epix_shots_array = np.asarray([[pro_datas[runs.index(k)].epix_norm for k in j] for j in scans_to_average])
+        all_epix_shots = np.asarray([np.concatenate(([epix_shots_array[j][i][:] for i in range(0,len(epix_shots_array[0]))]),0) for j in range(0,len(epix_shots_array))])
+        
+        xrt_shots_array = np.asarray([[pro_datas[runs.index(k)].xrt_norm for k in j] for j in scans_to_average])
+        all_xrt_shots = np.asarray([np.concatenate(([xrt_shots_array[j][i][:] for i in range(0,len(xrt_shots_array[0]))]),0) for j in range(0,len(xrt_shots_array))])
+        
+        shot_id_arrays = np.asarray([[[pro_datas[runs.index(k)].scan_name,pro_datas[runs.index(k)].eventIDs] for k in j] for j in scans_to_average])
+        shot_id = shot_id_arrays.flatten()
         return all_xrt_shots,all_epix_shots,shot_id
 
 def plot_average(pro_datas,input_vars):
+#     input_vars = [scans_to_average,all_shots,runs,boot,fraction,plot_type,plot_stacked,plot_residual,plot_deltaT_T, plot_bootstrap,check_dim,shot_by_shot]
     
     scans_to_average= input_vars[0]
     all_shots= input_vars[1]
@@ -34,19 +40,19 @@ def plot_average(pro_datas,input_vars):
     plot_stacked= input_vars[6]
     plot_residual= input_vars[7]
     plot_deltaT_T= input_vars[8]
-    plot_bootleg= input_vars[9]
+    plot_bootstrap= input_vars[9]
     check_dim= input_vars[10]
     shot_by_shot = input_vars[11]
     
     idx = np.searchsorted(runs,scans_to_average) # runs
     if all_shots:
+        input_vars = [scans_to_average,0,runs]
         all_xrt_shots,all_epix_shots,all_xrt_shots_based,shot_id = gather_shots(pro_datas,input_vars)                
     # len(all_xrt_shots[:][:][:])
-
-    if check_dim:
-        print(len(all_epix_shots))
-        print(len(all_xrt_shots))
-        print(len(shot_id))
+        if check_dim:
+            print(len(all_epix_shots))
+            print(len(all_xrt_shots))
+            print(len(shot_id))
         
     
 
@@ -89,7 +95,7 @@ def plot_average(pro_datas,input_vars):
         plt.show()
 
 
-    if plot_bootleg:
+    if plot_bootstrap:
         if type(boot)==int:
             plt.figure()
             for i in range(0,boot):

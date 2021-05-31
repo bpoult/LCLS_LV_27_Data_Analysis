@@ -49,7 +49,7 @@ class RawData:
         raw=self
         combined_conditions = np.asarray(conditions).all(axis=0)
 
-        epix=raw.epix_windowed[combined_conditions]
+        epix = raw.epix_windowed[combined_conditions]
         xrt = raw.xrt_red_res[combined_conditions]
         low_diode_us=np.squeeze(raw.low_diode_us[combined_conditions])
         high_diode_us=np.squeeze(raw.high_diode_us[combined_conditions])
