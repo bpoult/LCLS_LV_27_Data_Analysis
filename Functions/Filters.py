@@ -101,8 +101,8 @@ def lin_filter(raw_data,filt_param,bounds_conds):
         condition = cond_lin_high & cond_lin_low
     if np.logical_and(filt_param[3][0],'run_'+str(filt_param[3][1])==getattr(raw_data,'scan_name')):
         plt.figure()
-        plt.scatter(var_x[bounds_conds],var_y[bounds_conds],alpha=0.95)
-        plt.scatter(var_x[np.logical_and(bounds_conds,condition)],var_y[np.logical_and(bounds_conds,condition)],alpha=0.05)
+        plt.scatter(var_x,var_y,alpha=0.95)
+        plt.scatter(var_x[condition],var_y[condition],alpha=0.05)
         plt.title(filt_param[1]+' '+filt_param[2][0] +' vs '+ filt_param[2][1])
         plt.show()
     return condition

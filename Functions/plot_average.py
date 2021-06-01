@@ -9,6 +9,7 @@ import pickle
 
 def gather_shots(pro_datas,input_vars):
     scans_to_average= input_vars[0]
+    print(scans_to_average)
     runs= input_vars[2]
     if input_vars[1] is 0:
         idx = np.searchsorted(runs,scans_to_average) # runs

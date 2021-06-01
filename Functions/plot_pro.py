@@ -196,7 +196,7 @@ def plot_lots(pro_datas,input_vars):
             if deltaT_T_plot:
                 fig_4, ax_4 = plt.subplots()
                 plt.xlabel('energy, keV')
-                plt.title('[avg(epix)-avg(xrt)]/avg(xrt) | ' +str(boot)+ ' loops | random ' + str(round(fraction,2)) + ' of data per' )
+                plt.title('avg(epix)-avg(xrt)]/avg(xrt) | ' +str(boot)+ ' loops | random ' + str(round(fraction,2)) + ' of data per' )
 
         if plot_shotwise:
             if resid_plot:

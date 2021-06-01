@@ -11,6 +11,16 @@ import time
 from raw_data_class import RawData as RDC
 
 def load_data(save_dir,scan_name,ds_string, epix_roi, xrt_roi):
+    if not os.path.isdir(save_dir + scan_name):
+        try:
+            os.mkdir(save_dir + scan_name)
+        except:
+            os.mkdir(save_dir)
+            os.mkdir(save_dir + scan_name)
+    file1 = open(save_dir + scan_name + '/' + "scratch.txt", "w")
+    file1.write('x')
+    file1.close()
+        
     RawData = RDC()
 
     ds = ps.DataSource(ds_string)
@@ -41,7 +51,7 @@ def load_data(save_dir,scan_name,ds_string, epix_roi, xrt_roi):
     XRTMax = xrt_roi[1]
     start = time.time()
 
-    for nevent, evt in enumerate(ds.events()):
+    for nevent, evt in enumerate(ds.events()):     
         epix_evt = epix.calib_data(evt)
         xrt_evt = XRT.get(evt)
         wave8_evt = wave8.get(evt)
@@ -106,12 +116,7 @@ def load_data(save_dir,scan_name,ds_string, epix_roi, xrt_roi):
                             save_dir=save_dir,
                             ds_string=ds_string,
                             epix_motor=round(epix_motor,3))
-    if not os.path.isdir(save_dir + scan_name):
-        try:
-            os.mkdir(save_dir + scan_name)
-        except:
-            os.mkdir(save_dir)
-            os.mkdir(save_dir + scan_name)
+
 
     with open(save_dir + scan_name + '/' + "rawdata.pkl", "wb") as f:
         pickle.dump(RawData, f)
